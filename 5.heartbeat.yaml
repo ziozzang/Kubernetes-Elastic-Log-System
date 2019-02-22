@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: kube-system
+  name: heartbeat-config
+  labels:
+    k8s-app: heartbeat
+data:
+  heartbeat.yml: |-
+    heartbeat.config.monitors:
+      # Directory + glob pattern to search for configuration files
+      path: ${path.config}/monitors.d/*.yml
+      # If enabled, heartbeat will periodically check the config.monitors path for changes
+      reload.enabled: true
+      # How often to check for changes
+      reload.period: 5s
+
+    setup.dashboards.enabled: true
+    setup.kibana:
+      host: "elk-kibana.kube-elk:5601"
+    output.elasticsearch:
+      hosts: ['elasticsearch-client.kube-elk:9200']
+
+    heartbeat.monitors:
+    # https://www.elastic.co/guide/en/beats/heartbeat/6.7/heartbeat-configuration.html
+    - type: http
+      urls: ["http://elasticsearch-client.kube-elk:9200", "https://www.naver.com"]
+      schedule: "@every 10s"
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: kube-system
+  name: heartbeat
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: heartbeat
+    spec:
+      containers:
+      - name: heartbeat
+        image: docker.elastic.co/beats/heartbeat:6.6.0
+        volumeMounts:
+        - name: heartbeat-config
+          mountPath: /usr/share/heartbeat/heartbeat.yml
+          readOnly: true
+          subPath: heartbeat.yml
+      volumes:
+      - name: heartbeat-config
+        configMap:
+          name: heartbeat-config
