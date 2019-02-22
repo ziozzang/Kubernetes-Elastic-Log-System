@@ -8,6 +8,9 @@ metadata:
 data:
   filebeat.yml: |-
     name: ${NODE_NAME}
+    setup.dashboards.enabled: true
+    setup.kibana:
+            host: "elk-kibana.kube-elk:5601"
     setup.template.enabled: true
     filebeat.config:
       inputs:
