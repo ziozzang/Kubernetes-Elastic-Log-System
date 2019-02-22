@@ -1,5 +1,7 @@
 # Kubernetes-Elastic-Log-System
-Elastic-Stack for Logging System
+* Elastic-Stack for Logging System
+
+* Tested: 2019-02-22 (ES Release: 6.6.0)
 
 
 # How to setup
