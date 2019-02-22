@@ -8,6 +8,9 @@ metadata:
     k8s-app: metricbeat
 data:
   metricbeat.yml: |-
+    setup.dashboards.enabled: true
+    setup.kibana:
+            host: "elk-kibana.kube-elk:5601"
     metricbeat.config.modules:
       path: ${path.config}/modules.d/*.yml
       reload.enabled: true
